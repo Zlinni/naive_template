@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "es6",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "declaration":true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "types": [
+      "webpack-env"
+    ],
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost",
+      "ES6",
+      "ES2015",
+      "ES2015.Promise",
+      "ES2015.Generator"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "auto-imports.d.ts",
+    "src/@types/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "typeAcquisition":{
+    "enable": true,
+    "include": ["dayjs","naive-ui"]
+  }
+}
