@@ -1,3 +1,3 @@
-export default {
-  baseUrl: process.env.VUE_APP_URL,
-};
+export * from "./keyWord";
+export * from "./theme";
+export * from "./url";

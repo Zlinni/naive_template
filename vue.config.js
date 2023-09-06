@@ -1,13 +1,22 @@
-/* eslint-disable */
 const { defineConfig } = require("@vue/cli-service");
 const AutoImport = require("unplugin-auto-import/webpack");
 const Components = require("unplugin-vue-components/webpack");
 const { NaiveUiResolver } = require("unplugin-vue-components/resolvers");
+let proxy = {};
+// if (process.env.VUE_APP_MODE === "dev") {
+//   proxy = {
+//     "/example": {
+//       target: "exampleUrl",
+//       changeOrigin: true,
+//     },
+//   };
+// }
+
 module.exports = defineConfig({
   pages: {
     index: {
       // page 的入口
-      entry: 'src/main.ts',
+      entry: "src/main.ts",
     },
     // 当使用只有入口的字符串格式时，
     // 模板会被推导为 `public/subpage.html`
@@ -23,50 +32,67 @@ module.exports = defineConfig({
   assetsDir: "static",
   // 生产中禁用eslint报错
   // lintOnSave: process.env.NODE_ENV !== 'production',
+  lintOnSave: false,
   // 生产阶段的sourceMap 加快生产构建
   productionSourceMap: false,
   //webpack 配置的项目名称
   devServer: {
     hot: true,
-    port: 1222,
+    port: 1234,
     host: "0.0.0.0",
     // host: "localhost",
     open: false,
     client: {
       overlay: {
-        warnings: true,
-        errors: true,
+        warnings: false,
+        errors: false,
+        // runtimeErrors: (error) => {
+        //   return false;
+        //   // if (error.message === "ResizeObserver loop limit exceeded") {
+        //   //   return false;
+        //   // } else if (
+        //   //   error.message ===
+        //   //   "ResizeObserver loop completed with undelivered notifications"
+        //   // ) {
+        //   //   return false;
+        //   // }
+        //   // return true;
+        // },
       },
     },
-    // proxy: {
-    //   "/proxy": {
-    //     target: "http://192.168.11.169:8000",
-    //     // target: "https://musedash-test.peropero.net",
-    //     // target: "https://stg-prpr-muse-dash.peropero.net",
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       '^/proxy': ''
-    //     }
-    //   },
-    // },
+    //服务转发
+    // proxy,
+  },
+  // 其他环境设置hash值
+  chainWebpack: (config) => {
+    config.output
+      .filename("assets/js/[name].[hash].js")
+      .chunkFilename("assets/js/[name].[hash].js")
+      .end();
+    // 如果filenameHashing设置为了false，可以通过这段代码给打包出的css文件增加hash值
+    // config.plugin('extract-css').tap(args => [{
+    //   filename: 'assets/css/[name].[hash].css',
+    //   chunkFilename: 'assets/css/[name].[hash].css'
+    // }])
   },
   configureWebpack: {
-    // resolve: {extensions: ['.js', '.vue',".ts", ".tsx", ".json"]},
-    // module: {
-    //   rules: [
-    //     { test: /\.ts$/, loader: "ts-loader" },
-    //     { test: /\.vue$/, loader: "vue-loader" },
-    //   ]
-    // },
+    optimization: {
+      nodeEnv: false,
+    },
     plugins: [
-      // vue(),
       AutoImport({
         imports: [
           "vue",
           "vue-router",
           "pinia",
           {
-            "naive-ui": ["useDialog", "useMessage", "useNotification", "useLoadingBar", "NButton"],
+            "naive-ui": [
+              "useDialog",
+              "useMessage",
+              "useNotification",
+              "useLoadingBar",
+              "NButton",
+            ],
           },
         ],
         // eslint报错解决

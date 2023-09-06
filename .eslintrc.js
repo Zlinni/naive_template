@@ -9,6 +9,7 @@ module.exports = {
     "eslint:recommended",
     "@vue/typescript/recommended",
     "plugin:prettier/recommended",
+    // '@antfu'
   ],
   parserOptions: {
     ecmaVersion: 2020,
@@ -24,9 +25,8 @@ module.exports = {
     // ],
     "vue/multi-word-component-names": 0,
     "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-non-null-assertion": 0,
     "no-undef": 0,
-    "linebreak-style": [0, "error", "windows"],
-    "prettier/prettier": ["error", { endOfLine: "auto" }],
   },
   // files: ["*.ts", "*.tsx", "*.vue"],
 };

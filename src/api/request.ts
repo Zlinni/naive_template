@@ -1,32 +1,33 @@
-/* eslint-disable no-param-reassign */
-import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
-import config from "@/config";
-import { useRouter } from "vue-router";
-
-type GetIResponseData<T> = T extends AxiosPromise<infer U> ? U : never;
-export type GetPromiseFunctionData<T extends (...args: any) => any> =
-  GetIResponseData<ReturnType<T>>;
-
+import axios, { AxiosRequestConfig } from "axios";
+import router from "@/router";
+import { TOKEN_NAME } from "@/config";
 declare module "axios" {
   interface AxiosResponse<T = any> {
     code: number;
     data: T;
+    msg: string;
     // 这里追加你的参数
   }
   export function create(configs?: AxiosRequestConfig): AxiosInstance;
 }
-function request(axiosConfig: AxiosRequestConfig) {
+const request = (axiosConfig: AxiosRequestConfig) => {
   const service = axios.create({
-    baseURL: `${config.baseUrl}/api`, // env
+    baseURL: "",
     timeout: 50000,
   });
   // 请求拦截器全局
   service.interceptors.request.use(
-    (configs: any) => {
-      const token = localStorage.getItem("pero_authorization");
+    (configs: AxiosRequestConfig<any>) => {
+      const token = localStorage.getItem(TOKEN_NAME);
       if (token) {
+        if (configs.headers?.fakeAuthorization) {
+          configs.headers["Authorization"] = configs.headers.fakeAuthorization;
+          delete configs.headers.fakeAuthorization;
+          return configs;
+        }
         // 通过请求头的方式发送token
-        configs.headers.Authorization = token;
+        configs.headers &&
+          (configs.headers["Authorization"] = "Bearer " + token);
       }
       return configs;
     },
@@ -48,17 +49,27 @@ function request(axiosConfig: AxiosRequestConfig) {
       return res.data;
     },
     (err) => {
-      const { status } = err.response;
-      console.log(status, "status");
-      if (status === 401) {
-        const router = useRouter();
-        router.push({
-          name: "Login",
-        });
+      // 如果是被取消的请求不返回error
+      if (err?.code === "ERR_CANCELED") {
+        return {
+          data: null,
+        };
+      }
+      if (err.response) {
+        const { status, data, msg } = err.response;
+        // const { code } = data;
+        // const errText = getErrorCode(code);
+        window?.$message?.error(msg);
+        if (status === 401) {
+          localStorage.removeItem(TOKEN_NAME);
+          router.push({
+            name: "Login",
+          });
+        }
       }
       Promise.reject(err);
     }
   );
   return service(axiosConfig);
-}
+};
 export default request;
